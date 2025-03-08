@@ -35,9 +35,9 @@ const [disabled, setDisabled] = useState(false);
     
     //compare 2 selected cards
     useEffect(() => {
-      setDisabled(true)
+    
       if(optOne && optTwo){
-        
+        setDisabled(true)
         if(optOne.src === optTwo.src){
           setCards(prevCards => {
             return prevCards.map(card => {
