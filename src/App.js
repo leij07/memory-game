@@ -1,25 +1,83 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from 'react'
+import './App.css'
+import SingleCard from './components/SingleCard';
+const cardImages = [
+    {"src" : "/img/books.jpg", matched: false},
+    {"src" : "/img/butterfly.jpg", matched: false},
+    {"src" : "/img/ribbon.jpg", matched: false},
+    {"src" : "/img/rose.jpg", matched: false},
+    {"src" : "/img/teddy.jpg", matched: false},
+    {"src" : "/img/telephone.jpg", matched: false}
+    
 
-function App() {
+]
+
+export function App() {
+const [cards, setCards] = useState([]);
+const [turns, setTurns] = useState(0);
+const [optOne, setOptOne] = useState(null);
+const [optTwo, setOptTwo] = useState(null);
+
+    //shuffle cards
+    const shuffleCards = () =>{
+        const shuffledCards = [...cardImages,...cardImages]
+        .sort(() => Math.random() - 0.5)
+        .map((card) => ({...card, id: Math.random() }));
+        setCards(shuffledCards);
+        setTurns(0);
+    }
+  
+    //handle a choice
+    const handleOption = (card) =>{
+      optOne ? setOptTwo(card) : setOptOne(card);
+    }
+    
+    //compare 2 selected cards
+    useEffect(() => {
+      if(optOne && optTwo){
+        
+        if(optOne.src === optTwo.src){
+          setCards(prevCards => {
+            return prevCards.map(card => {
+              if(card.src === optOne.src){
+                return{...card, matched: true}
+              }else{
+                return card
+              }
+            })
+          })
+          resetTurn()
+        }else{
+    
+          setTimeout(() => resetTurn(), 500) 
+        }
+      }
+    }, [optOne, optTwo])
+
+    //reset options and increase turns
+    const resetTurn =() =>{
+      setOptOne(null);
+      setOptTwo(null);
+      setTurns(prevTurns => prevTurns + 1)
+    }
+
+    
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+     <h1>Magic Match</h1>
+
+     <button onClick={shuffleCards}> New Game</button>
+     <div className="card-grid">
+        {cards.map(card => (
+           <SingleCard key={card.id} card={card}
+           handleOption={handleOption}
+           flipped={card === optOne || card === optTwo || card.matched}
+           />
+        ))}
+     </div>
     </div>
   );
 }
 
-export default App;
+export default App
